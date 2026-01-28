@@ -40,6 +40,42 @@ export class OpenHourDto {
   public isActive: boolean;
 }
 
+export class OptionDto {
+  @IsNotEmpty()
+  @IsString()
+  public id: string;
+
+  @IsNotEmpty()
+  @IsString()
+  public title: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  public price: number;
+
+  @IsNumber()
+  public childPrice: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  public weekendPrice: number;
+
+  @IsNumber()
+  public weekendChildPrice: number;
+
+  @IsNotEmpty()
+  @IsString()
+  public detail: string;
+
+  @IsNotEmpty()
+  @IsString()
+  public blockFrom: string;
+
+  @IsNotEmpty()
+  @IsString()
+  public blockTo: string;
+}
+
 // export class PricingTierDto  {
 //   @IsNotEmpty()
 //   @IsNumber()
@@ -268,6 +304,11 @@ export class CreateTicketDto {
   @Type(() => OpenHourDto)
   public openingHours: OpenHourDto[];
 
+  @IsArray()
+  @ValidateNested({ each: true, message: "Invalid package option array provided." })
+  @ArrayMinSize(0)
+  @Type(() => OptionDto)
+  public options: OptionDto[];
   // @IsArray()
   // @Type(() => PricingTierDto)
   // public pricingTiers: PricingTierDto[];

@@ -52,7 +52,7 @@ import {
   VisuallyHiddenInput,
   AppTableCell
 } from "../../components";
-import { InfoChangeType, BOOKING_TYPE, WeekType, initInclude, initTicket, initCoupon, initDiscount, STATUS, QR_GENERATION_TYPE, QrCode, Barcode, ClosingDate, CouponItem, DISCOUNT_TYPE, EXPIRE_TYPE, Discount } from "../../types";
+import { InfoChangeType, BOOKING_TYPE, WeekType, initInclude, initTicket, initCoupon, initDiscount, STATUS, QR_GENERATION_TYPE, QrCode, Barcode, ClosingDate, CouponItem, DISCOUNT_TYPE, EXPIRE_TYPE, Discount, OptionItem, initOption } from "../../types";
 import { CreateTicketDto } from "../../dtos";
 import { currencySelector } from "../../redux/currency/selector";
 import { destinationSelector } from "../../redux/destination/selector";
@@ -95,6 +95,7 @@ export const TicketEdit = () => {
   const [instructions, setInstructions] = useState<string[]>([""]);
   const [closingDate, setClosingDate] = useState<ClosingDate[]>([{ startDate: "", endDate: "" }]);
   const [coupon, setCoupon] = useState<CouponItem[]>([initCoupon]);
+  const [option, setOption] = useState<OptionItem[]>([]);
   // const [barcode, setBarcode] = useState<BarcodeItem[]>([initBarcode]);
   const [discount, setDiscount] = useState<Discount>(initDiscount);
   const [timeSlots, setTimeSlots] = useState<string[]>([""]);
@@ -136,6 +137,11 @@ export const TicketEdit = () => {
       if (temp.coupon?.length) {
         setCoupon(temp.coupon);
       }
+
+      if (temp.options?.length) {
+        setOption(temp.options);
+      }
+      
       if (temp.discount) {
         setDiscount(temp.discount);
       }
@@ -278,6 +284,8 @@ export const TicketEdit = () => {
           "barcodes": item[0],
           "type": item[1],
           "date": item[2],
+          "ticketOption": item[3] || '',
+          "dayType": (item[4] || '').toLocaleLowerCase(),
           "isUsed": false,
           "usedEmail": '',
           "questFirstName": '',
@@ -312,6 +320,8 @@ export const TicketEdit = () => {
           "barcodes": item[0],
           "type": item[1],
           "date": StringUtil.convertExcelDate(item[2]),
+          "ticketOption": item[3] || '',
+          "dayType": (item[4] || '').toLocaleLowerCase(),
           "isUsed": false,
           "usedEmail": '',
           "questFirstName": '',
@@ -448,6 +458,36 @@ export const TicketEdit = () => {
         break;
     }
   };
+
+  const onChangeOption = (type: InfoChangeType, index: number, target: string = "", value: any = "") => {
+    switch (type) {
+      case "change":
+        const temp: OptionItem[] = [...option];
+        temp[index][target] = value;
+        if (!temp[index].id) {
+          temp[index]['id'] = StringUtil.generateRandomCode();
+        }
+        setOption(temp);
+        setError("options", {});
+        setValue("options", temp);
+        break;
+      case "add":
+        let tempInite = JSON.parse(JSON.stringify(initOption));
+        tempInite.id = StringUtil.generateRandomCode();
+        tempInite.price = 0;
+        const addedVal = [...option.slice(0, index), tempInite, ...option.slice(index)];
+        setOption(addedVal);
+        setValue("options", addedVal);
+        break;
+      case "remove":
+        const removedVal = [...option.slice(0, index), ...option.slice(index + 1)];
+        setOption(removedVal);
+        setValue("options", removedVal);
+        break;
+    }
+  };
+
+
 
   // const onChangeBarcode = (type: InfoChangeType, index: number, target: string = "", value: any = "") => {
   //   switch (type) {
@@ -820,6 +860,150 @@ export const TicketEdit = () => {
         </Grid>
       )),
     [coupon, errors]
+  );
+
+  const OptionRow = useMemo(
+    () =>
+      option?.map((one, optionIndex) => (
+        <Grid item xs={12} container spacing={2} columnSpacing={2} key={optionIndex} sx={{ marginBottom: 1, marginTop: 1 }}>
+          <Grid item xs={9} lg={11}>
+            <TicketInfoTitle title="Title" component={"p"} />
+            <TextField
+              type="text"
+              size="small"
+              fullWidth
+              label=""
+              variant="outlined"
+              value={one.title}
+              sx={AppTextFieldSX()}
+              error={!!errors.options && !!errors.options[optionIndex]?.title}
+              {...register(`options.${optionIndex}.title`)}
+              onChange={(e) => onChangeOption("change", optionIndex, "title", e.target.value as string)}
+            />
+          </Grid>
+          <Grid item xs={3} lg={1}>
+            <TicketInfoTitle title="Action" />
+            <Box sx={{ gap: 0.5, display: "flex", flexDirection: "row" }}>
+              <Button
+                variant="contained"
+                color="error"
+                size="small"
+                onClick={() => onChangeOption("remove", optionIndex)}
+                disabled={option.length === 0}
+              >
+                <RemoveIcon sx={{ width: 20, height: 20 }} />
+              </Button>
+              <Button
+                variant="contained"
+                color="light"
+                size="small"
+                onClick={() => onChangeOption("add", optionIndex + 1)}
+              >
+                <AddIcon sx={{ width: 20, height: 20 }} />
+              </Button>
+            </Box>
+          </Grid>
+          <Grid item xs={5} lg={2}>
+            <TicketInfoTitle title="Price" component={"p"} />
+            <TextField
+              type="number"
+              size="small"
+              label=""
+              variant="outlined"
+              value={one.price}
+              error={!!errors.options && !!errors.options[optionIndex]?.price}
+              sx={AppTextFieldSX()}
+              {...register(`options.${optionIndex}.price`, { valueAsNumber: true })}
+              onChange={(e) => onChangeOption("change", optionIndex, "price", e.target.value as string)}
+            />
+          </Grid>
+          <Grid item xs={4} lg={2}>
+            <TicketInfoTitle title="Child Price" component={"p"} />
+            <TextField
+              type="number"
+              size="small"
+              label=""
+              variant="outlined"
+              value={one.childPrice}
+              error={!!errors.options && !!errors.options[optionIndex]?.childPrice}
+              sx={AppTextFieldSX()}
+              {...register(`options.${optionIndex}.childPrice`, { valueAsNumber: true })}
+              onChange={(e) => onChangeOption("change", optionIndex, "childPrice", e.target.value as string)}
+            />
+          </Grid>
+          <Grid item xs={5} lg={2}>
+            <TicketInfoTitle title="Weekend Price" component={"p"} />
+            <TextField
+              type="number"
+              size="small"
+              label=""
+              variant="outlined"
+              value={one.weekendPrice}
+              error={!!errors.options && !!errors.options[optionIndex]?.weekendPrice}
+              sx={AppTextFieldSX()}
+              {...register(`options.${optionIndex}.weekendPrice`, { valueAsNumber: true })}
+              onChange={(e) => onChangeOption("change", optionIndex, "weekendPrice", e.target.value as string)}
+            />
+          </Grid>
+          <Grid item xs={4} lg={2}>
+            <TicketInfoTitle title="Weekend Child Price" component={"p"} />
+            <TextField
+              type="number"
+              size="small"
+              label=""
+              variant="outlined"
+              value={one.weekendChildPrice}
+              error={!!errors.options && !!errors.options[optionIndex]?.weekendChildPrice}
+              sx={AppTextFieldSX()}
+              {...register(`options.${optionIndex}.weekendChildPrice`, { valueAsNumber: true })}
+              onChange={(e) => onChangeOption("change", optionIndex, "weekendChildPrice", e.target.value as string)}
+            />
+          </Grid>
+          <Grid item xs={9} lg={3}>
+            <TicketInfoTitle title="Block date" />
+            <FlexRow sx={{ gap: 0.5 }}>
+              <TextField
+                type="date"
+                size="small"
+                label=""
+                variant="outlined"
+                fullWidth
+                value={one.blockFrom}
+                error={!!errors.options && !!errors.options[optionIndex]?.blockFrom}
+                sx={AppTextFieldSX()}
+                {...register(`options.${optionIndex}.blockFrom`)}
+                onChange={(e) => onChangeOption("change", optionIndex, "blockFrom", e.target.value as string)}
+              />
+              <Typography sx={{ mt: 0.5, color: "white" }}></Typography>
+              <TextField
+                type="date"
+                size="small"
+                label=""
+                variant="outlined"
+                fullWidth
+                value={one.blockTo}
+                error={!!errors.options && !!errors.options[optionIndex]?.blockTo}
+                sx={AppTextFieldSX()}
+                {...register(`options.${optionIndex}.blockTo`)}
+                onChange={(e) => onChangeOption("change", optionIndex, "blockTo", e.target.value as string)}
+              />
+            </FlexRow>
+          </Grid>
+          <Grid item xs={9} lg={11}>
+            <InfoEditBoxWithRef
+              title="Detail"
+              lineCount={6}
+              variant="outlined"
+              value={one.detail}
+              sx={AppTextFieldSX()}
+              error={!!errors.options && !!errors.options[optionIndex]?.detail}
+              {...register(`options.${optionIndex}.detail`)}
+              onChange={(e) => onChangeOption("change", optionIndex, "detail", e.target.value as string)}
+            />
+          </Grid>
+        </Grid>
+      )),
+    [option, errors]
   );
 
   const OpenHoursRows = useMemo(
@@ -1777,6 +1961,8 @@ export const TicketEdit = () => {
                                   <AppTableCell value="No" isTitle isFirstCell sx={{ width: { xs: 30, sm: 50 } }} />
                                   <AppTableCell value="Barcodes" isTitle sx={{ width: { sm: 120, md: 140 } }} />
                                   <AppTableCell value="Type" isTitle sx={{ width: { sm: 150, md: 200 } }} />
+                                  <AppTableCell value="Ticket Option" isTitle sx={{ width: { sm: 150, md: 200 } }} />
+                                  <AppTableCell value="Day Type" isTitle sx={{ width: { sm: 150, md: 200 } }} />
                                   <AppTableCell value="Used Email" isTitle sx={{ width: { sm: 150, md: 200 } }} />
                                   <AppTableCell value="Guest Name" isTitle sx={{ width: { sm: 150, md: 200 } }} />
                                 </TableRow>
@@ -1792,6 +1978,8 @@ export const TicketEdit = () => {
                                     <AppTableCell scope="row" value={index + 1} isFirstCell isVerticalTop />
                                     <AppTableCell value={row.barcodes} isVerticalTop />
                                     <AppTableCell value={row.type} isVerticalTop />
+                                    <AppTableCell value={row.ticketOption} isVerticalTop />
+                                    <AppTableCell value={row.dayType} isVerticalTop />
                                     <AppTableCell value={row.usedEmail} isVerticalTop />
                                     { row.questFirstName ?
                                       <AppTableCell value={row.questFirstName + ' ' + row.questLastName} isVerticalTop /> : 
@@ -1886,6 +2074,8 @@ export const TicketEdit = () => {
                               <AppTableCell value="No" isTitle isFirstCell sx={{ width: { xs: 30, sm: 50 } }} />
                               <AppTableCell value="Barcodes" isTitle sx={{ width: { sm: 150, md: 200 } }} />
                               <AppTableCell value="Type" isTitle sx={{ width: { sm: 120, md: 140 } }} />
+                              <AppTableCell value="Ticket Option" isTitle sx={{ width: { sm: 120, md: 140 } }} />
+                              <AppTableCell value="Day Type" isTitle sx={{ width: { sm: 120, md: 140 } }} />
                               <AppTableCell value="Date" isTitle sx={{ width: { sm: 150, md: 200 } }} />
                               <AppTableCell value="Used Email" isTitle sx={{ width: { sm: 150, md: 200 } }} />
                               <AppTableCell value="Guest Name" isTitle sx={{ width: { sm: 150, md: 200 } }} />
@@ -1902,6 +2092,8 @@ export const TicketEdit = () => {
                                 <AppTableCell scope="row" value={index + 1} isFirstCell isVerticalTop />
                                 <AppTableCell value={row.barcodes} isVerticalTop />
                                 <AppTableCell value={row.type} isVerticalTop />
+                                <AppTableCell value={row.ticketOption} isVerticalTop />
+                                <AppTableCell value={row.dayType} isVerticalTop />
                                 <AppTableCell value={MomentUtil.getDateStr(row.date, "MM/DD/YYYY")} isVerticalTop />
                                 <AppTableCell value={row.usedEmail} isVerticalTop />
                                 { row.questFirstName ?
@@ -2230,6 +2422,21 @@ export const TicketEdit = () => {
                 {errors.isFeatured && <FormHelperText sx={{ mt: 0 }}>{errors.isFeatured.message}</FormHelperText>}
               </FormControl>
             </Grid>
+
+            {/* Package Options */}
+            <TicketSectionGrid title="Package Options" />
+            {option.length === 0 && (
+              <Button
+                variant="contained"
+                color="light"
+                size="small"
+                sx={{ marginLeft: "180px", marginTop: "-18px" }}
+                onClick={() => onChangeOption("add", 1)}
+              >
+                <AddIcon sx={{ width: 20, height: 20 }} />
+              </Button>
+            )}
+            <Box sx={{ width: "100%", paddingLeft: "16px" }}>{OptionRow}</Box>
           </Grid>
 
           <FlexRow sx={{ mt: { xs: 4, sm: 5 }, mb: { xs: 1, sm: 2 }, justifyContent: "center", gap: 1.5 }}>

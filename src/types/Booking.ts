@@ -1,5 +1,6 @@
 import { User } from "./User";
 import { STATUS } from "./status.enum";
+import { OptionItem } from "./Ticket";
 
 export interface Booking {
   _id: string;
@@ -21,4 +22,5 @@ export interface Booking {
   ticketTitle: string;
   bookingType: string;
   ticketFileUrl: string;
+  ticketOption: OptionItem;
 }

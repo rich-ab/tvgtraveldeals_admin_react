@@ -37,6 +37,19 @@ export enum DISCOUNT_TYPE {
   FIXED_AMOUNT = "fixed_amount",
 }
 
+export interface OptionItem {
+  id: string,
+  title: string,
+  price: number;
+  childPrice: number;
+  weekendPrice: number;
+  weekendChildPrice: number;
+  detail: string,
+  blockFrom: string,
+  blockTo: string,
+  [key: string]: any 
+}
+
 // export interface PricingTierItem {
 //   day: number;
 //   rate: number;
@@ -104,6 +117,7 @@ export interface Ticket {
   highlights: string[];
   instructions: string[];
   openingHours: OpenHourItem[];
+  options: OptionItem[];
   // pricingTiers: PricingTierItem[];
   closingDate: ClosingDate[];
   coupon: CouponItem[];
@@ -129,6 +143,8 @@ export interface QrCode {
   usedEmail: string;
   questFirstName: string;
   questLastName: string;
+  ticketOption: any;
+  dayType: string;
 }
 
 export interface Barcode {
@@ -139,6 +155,8 @@ export interface Barcode {
   usedEmail: string;
   questFirstName: string;
   questLastName: string;
+  ticketOption: any;
+  dayType: string;
 }
 
 export const initOpeningHours: OpenHourItem[] = [
@@ -166,6 +184,7 @@ export const initInclude: IncludeItem = { isActive: true, content: "" };
 export const initLocation: LocationItem = { address: "", link: "" };
 
 export const initCoupon: CouponItem = { isActive: false, discountType: DISCOUNT_TYPE.PERCENT, expireType: EXPIRE_TYPE.ONE_TIME, value: '0',  code: StringUtil.generateRandomCode(), startDate: "", endDate: "" };
+export const initOption: OptionItem = { id: '', title: '', price: 0, childPrice: 0, weekendPrice: 0, weekendChildPrice: 0, detail: '', blockFrom: '', blockTo: '' };
 
 export const initDiscount: Discount = { isActive: false, value: '0', startDate: "", endDate: "" };
 
