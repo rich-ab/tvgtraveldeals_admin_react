@@ -119,7 +119,7 @@ export const TicketEdit = () => {
   const editData = useMemo(() => {
     if (idVal && idVal !== "new") {
       let temp = tickets.filter((one) => one.id == idVal)[0];
-      const destination = temp.destination?.id ?? destinations[0].id ?? null;
+      const destination = temp?.destination?.id ?? destinations[0].id ?? null;
       const currency = temp.currency?.id ?? currencies[0].id ?? null;
       if (!temp.qrCodeGenerationType) {
         temp.qrCodeGenerationType = QR_GENERATION_TYPE.SELF_GENERATION;
