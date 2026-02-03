@@ -917,7 +917,25 @@ export const TicketEdit = () => {
               onChange={(e) => onChangeOption("change", optionIndex, "price", e.target.value as string)}
             />
           </Grid>
-          <Grid item xs={4} lg={2}>
+          
+          <Grid item xs={4} lg={9}>
+            <TicketInfoTitle title="Affiliate Link" />
+            <FlexRow sx={{ gap: 0.5 }}>
+              <TextField
+                type="text"
+                size="small"
+                label=""
+                variant="outlined"
+                fullWidth
+                value={one.affiliateLink}
+                error={!!errors.options && !!errors.options[optionIndex]?.affiliateLink}
+                sx={AppTextFieldSX()}
+                {...register(`options.${optionIndex}.affiliateLink`)}
+                onChange={(e) => onChangeOption("change", optionIndex, "affiliateLink", e.target.value as string)}
+              />
+            </FlexRow>
+          </Grid>
+          {/* <Grid item xs={4} lg={2}>
             <TicketInfoTitle title="Child Price" component={"p"} />
             <TextField
               type="number"
@@ -988,7 +1006,7 @@ export const TicketEdit = () => {
                 onChange={(e) => onChangeOption("change", optionIndex, "blockTo", e.target.value as string)}
               />
             </FlexRow>
-          </Grid>
+          </Grid> */}
           <Grid item xs={9} lg={11}>
             <InfoEditBoxWithRef
               title="Detail"

@@ -53,27 +53,30 @@ export class OptionDto {
   @IsNumber()
   public price: number;
 
-  @IsNumber()
-  public childPrice: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  public weekendPrice: number;
-
-  @IsNumber()
-  public weekendChildPrice: number;
-
   @IsNotEmpty()
   @IsString()
   public detail: string;
 
-  @IsNotEmpty()
-  @IsString()
-  public blockFrom: string;
+  @IsOptional()
+  public affiliateLink: string;
 
-  @IsNotEmpty()
-  @IsString()
-  public blockTo: string;
+  // @IsNumber()
+  // public childPrice: number;
+
+  // @IsNotEmpty()
+  // @IsNumber()
+  // public weekendPrice: number;
+
+  // @IsNumber()
+  // public weekendChildPrice: number;
+
+  // @IsNotEmpty()
+  // @IsString()
+  // public blockFrom: string;
+
+  // @IsNotEmpty()
+  // @IsString()
+  // public blockTo: string;
 }
 
 // export class PricingTierDto  {
