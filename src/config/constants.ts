@@ -2,8 +2,9 @@ import { ENV } from "../types";
 
 export const SITE = {
   // WEB: ENV.IS_PROD ? "https://tvgtraveldeals.com" : "https://staging.tvgtraveldeals.com",
-  WEB: ENV.IS_PROD ? "https://tvgtraveldeals.com" : "https://staging.tvgtraveldeals.com",
-  ADMIN: ENV.IS_PROD ? "https://admin.tvgtraveldeals.com" : "https://staging.admin.tvgtraveldeals.com",
+  // ADMIN: ENV.IS_PROD ? "https://admin.tvgtraveldeals.com" : "https://staging.admin.tvgtraveldeals.com",
+  WEB: ENV.IS_PROD ? "https://tvgtraveldeals.com" : "https://master.d10g02vne2w6rq.amplifyapp.com",
+  ADMIN: ENV.IS_PROD ? "https://admin.tvgtraveldeals.com" : "https://master.dmp9msz8o3obq.amplifyapp.com",
 };
 
 export const PERMISSIONS = [
